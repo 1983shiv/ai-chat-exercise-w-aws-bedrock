@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState, useMemo, useRef } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
 
-type ChatMessages = { role: 'user' | 'assistance'; txt: string };
+type ChatMessages = { role: 'user' | 'assistance'; text: string };
 
 export default function Chat() {
     const client = useMemo(() => generateClient<Schema>(), []);
@@ -20,18 +20,18 @@ export default function Chat() {
 
     async function onSubmit(e: FormEvent) {
         e.preventDefault();
-        const txt = input.trim();
-        if (!txt || loading) return;
+        const text = input.trim();
+        if (!text || loading) return;
 
         setInput('');
         setError(null);
 
-        setMessages((m) => [...m, { role: 'user', txt }]);
+        setMessages((m) => [...m, { role: 'user', text }]);
         setLoading(true);
 
         try {
             const { data, errors } = await client.queries.chat({
-                message: txt,
+                message: text,
             });
             if (errors?.length) {
                 throw new Error(errors.map((x) => x.message).join(';'));
@@ -39,7 +39,7 @@ export default function Chat() {
 
             setMessages((m) => [
                 ...m,
-                { role: 'assistance', txt: data ?? '(no response)' },
+                { role: 'assistance', text: data ?? '(no response)' },
             ]);
         } catch (err) {
             setError(
@@ -55,7 +55,7 @@ export default function Chat() {
             <div className="log" aria-live="polite">
                 {messages.map((m, i) => (
                     <div key={i} className={'bubble ${m.role}'}>
-                        {m.txt}
+                        {m.text}
                     </div>
                 ))}
             </div>
