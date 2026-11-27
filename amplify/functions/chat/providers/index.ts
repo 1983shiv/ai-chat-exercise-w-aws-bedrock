@@ -4,6 +4,7 @@ import type { ChatProvider } from './types';
 import { MockProvider } from './mock';
 import { GeminiProvider } from './gemini';
 import { OpenRouterProvider } from './openrouter';
+import { BedrockProvider } from './bedrock';
 
 function requireEnv(name: keyof typeof env): string {
   const value = env[name];
@@ -28,6 +29,8 @@ export function getProvider(): ChatProvider {
         requireEnv('OPENROUTER_API_KEY'),
         requireEnv('OPENROUTER_MODEL')
       );
+    case 'bedrock':
+      return new BedrockProvider(requireEnv('BEDROCK_MODEL_ID'));
     default:
       throw new Error(`Unknown LLM_PROVIDER: ${kind}`);
   }
