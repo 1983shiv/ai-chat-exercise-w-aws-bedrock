@@ -6,6 +6,8 @@ import {
 } from '@aws-sdk/client-cloudwatch-logs';
 import { GetCallerIdentityCommand, STSClient } from '@aws-sdk/client-sts';
 
+
+
 const runtime = globalThis as typeof globalThis & {
   process?: {
     env?: Record<string, string | undefined>;
