@@ -4,8 +4,10 @@ import { Amplify } from 'aws-amplify';
 import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import outputs from '@/amplify_outputs.json';
-import TokenPeek from '@/components/TokenPeek';
+// import TokenPeek from '@/components/TokenPeek';
 import Chat from '@/components/Chat';
+import DebugButton from '@/components/DebugButton';
+
 
 Amplify.configure(outputs);
 
@@ -30,6 +32,7 @@ export default function Home() {
                         
                         </header>
                         <Chat />
+                        <DebugButton />
                     </main>
                 </div>
             )}

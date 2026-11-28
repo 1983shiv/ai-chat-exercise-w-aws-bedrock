@@ -1,45 +1,35 @@
-import type { Schema } from "../../data/resource"
+import type { Schema } from '../../data/resource';
 import { getProvider } from './providers';
-
+import { log } from './log';
 
 type Identity = {
-    sub?: string;
-    username?: string;
-    claims?: Record<string, unknown>;
+  sub?: string;
+  username?: string;
+  claims?: Record<string, unknown>;
 } | null | undefined;
 
-export const handler: Schema['chat']['functionHandler'] = async(event) => {
-    const identity = event.identity as unknown as Identity;
-    const who = identity?.username ?? identity?.sub ?? 'unknown';
-    // const email = typeof identity?.claims?.email === 'string' ? identity.claims.email : 'unknown';
-    const prompt = (event.arguments.message ?? '').trim();
+export const handler: Schema['chat']['functionHandler'] = async (event, context) => {
+  const identity = event.identity as unknown as Identity;
+//   const prompt = (event.arguments.message ?? '').trim();
+  const prompt = event.arguments.message.trim();
 
-    if(!prompt){
-        return "Please type a message";
-    }
+  if (!prompt) {
+    log('WARN', 'empty prompt', { requestId: context.awsRequestId });
+    return 'Please type a message.';
+  }
 
-    const provider = getProvider();
-    const started = Date.now();
-    const reply = await provider.complete(prompt);
-    
-    console.log(
-        JSON.stringify({
-            Level: 'INFO',
-            msg: 'completion OK',
-            sub: identity?.sub,
-            username: identity?.username,
-            tokenUse: identity?.claims?.token_use,
-            claimKeys: Object.keys(identity?.claims ?? {}),
-            promptText: prompt,
-            promptLength: prompt.length,
-            latencyMs: Date.now() - started,
-            replyLength: reply.length,
-        })
-    );
+  const provider = getProvider();
+  const started = Date.now();
+  const reply = await provider.complete(prompt);
 
+  log('INFO', 'completion ok', {
+    requestId: context.awsRequestId,
+    provider: provider.name,
+    sub: identity?.sub,
+    latencyMs: Date.now() - started,
+    promptLength: prompt.length,
+    replyLength: reply.length,
+  });
 
-
-    // await new Promise((r) => setTimeout(r, 2000));
-    // return `Hello ${who}! You said: ${prompt}`;
-    return reply;
-}
+  return reply;
+};
